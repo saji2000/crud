@@ -4,6 +4,8 @@ const cors = require("cors");
 const cookieParse = require("cookie-parser");
 const mongoose = require("mongoose");
 
+const authRouter = require("./routers/authRouter");
+
 const app = express();
 app.use(cors());
 app.use(helmet());
@@ -15,6 +17,8 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("Database Connected"))
   .catch((err) => console.log(err));
+
+app.use("/api/auth", authRouter);
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello from the server" });
