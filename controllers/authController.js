@@ -40,3 +40,7 @@ exports.signup = async (req, res) => {
     console.log(err);
   }
 };
+
+exports.signin = async (req, res) => {
+  const { email, password } = req.body;
+};
