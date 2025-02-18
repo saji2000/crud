@@ -8,11 +8,5 @@ exports.signupSchema = Joi.object({
     .email({
       tlds: { allow: ["com", "net"] },
     }),
-  password: Joi.string()
-    .required()
-    .pattern(
-      new RegExp(
-        "^(?=.*[A-Z])(?=.*[a-z])(?=.*d)(?=.*[@$!%*?&])[A-Za-zd@$!%*?&]{8,}$"
-      )
-    ),
+  password: Joi.string().required().pattern(new RegExp("^.{6,}$")),
 });

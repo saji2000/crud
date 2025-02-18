@@ -1,4 +1,5 @@
-const signupSchema = require("../middleware/validator");
+const { hash } = require("../utils/hashing");
+const { signupSchema } = require("../middleware/validator");
 const User = require("../models/usersModel");
 
 exports.signup = async (req, res) => {
@@ -22,6 +23,19 @@ exports.signup = async (req, res) => {
         .status(401)
         .json({ success: false, message: "User already exists" });
     }
+
+    const hashedPassword = await hash(password);
+
+    const newUser = await new User({ email, password: hashedPassword });
+
+    const result = await newUser.save();
+
+    result.password = undefined;
+    res.status(201).json({
+      success: true,
+      message: "Your account has been created successfully.",
+      result,
+    });
   } catch (err) {
     console.log(err);
   }
