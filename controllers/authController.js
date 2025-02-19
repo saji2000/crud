@@ -1,5 +1,5 @@
 const { hash } = require("../utils/hashing");
-const { signupSchema } = require("../middleware/validator");
+const { signupSchema, signinSchema } = require("../middleware/validator");
 const User = require("../models/usersModel");
 
 exports.signup = async (req, res) => {
@@ -43,4 +43,24 @@ exports.signup = async (req, res) => {
 
 exports.signin = async (req, res) => {
   const { email, password } = req.body;
+
+  try {
+    const { error, value } = signinSchema.validate({
+      email: email,
+    });
+
+    if (error) {
+      return res
+        .status(401)
+        .json({ success: false, message: error.details[0].message });
+    }
+
+    const user = User.findOne({ email: email }).select("+password");
+
+    console.log(user);
+
+    // bcrypt.compare(password, hash, function (err, result) {});
+  } catch (err) {
+    console.log(err);
+  }
 };
