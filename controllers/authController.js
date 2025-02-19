@@ -1,3 +1,4 @@
+const bcrypt = require("bcrypt");
 const { hash } = require("../utils/hashing");
 const { signupSchema, signinSchema } = require("../middleware/validator");
 const User = require("../models/usersModel");
@@ -45,7 +46,7 @@ exports.signin = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const { error, value } = signinSchema.validate({
+    const { error } = signinSchema.validate({
       email: email,
     });
 
@@ -55,11 +56,22 @@ exports.signin = async (req, res) => {
         .json({ success: false, message: error.details[0].message });
     }
 
-    const user = User.findOne({ email: email }).select("+password");
+    const user = await User.findOne({ email: email }).select("+password");
 
-    console.log(user);
+    if (!user) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email does not exists" });
+    }
 
-    // bcrypt.compare(password, hash, function (err, result) {});
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Wrong password" });
+    }
+
+    return res.status(200).json({ success: true, message: "Signed In" });
   } catch (err) {
     console.log(err);
   }
