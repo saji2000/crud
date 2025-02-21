@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 const { hash } = require("../utils/hashing");
 const { signupSchema, signinSchema } = require("../middleware/validator");
 const User = require("../models/usersModel");
@@ -45,6 +46,7 @@ exports.signup = async (req, res) => {
 
 // Sign In function
 exports.signin = async (req, res) => {
+  console.log(process.env.PORT);
   const { email, password } = req.body;
 
   try {
@@ -72,6 +74,21 @@ exports.signin = async (req, res) => {
         .status(400)
         .json({ success: false, message: "Wrong password" });
     }
+
+    const token = await jwt.sign(
+      { userId: user._id, email: user.email, verified: user.verified },
+      process.env.SECRET_KEY,
+      {
+        expiresIn: "12h",
+      }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 12 * 60 * 60 * 1000, // 12 hours in milliseconds
+    });
 
     return res.status(200).json({ success: true, message: "Signed In" });
   } catch (err) {
