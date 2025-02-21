@@ -3,6 +3,7 @@ const { hash } = require("../utils/hashing");
 const { signupSchema, signinSchema } = require("../middleware/validator");
 const User = require("../models/usersModel");
 
+// Sign Up Function
 exports.signup = async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -42,6 +43,7 @@ exports.signup = async (req, res) => {
   }
 };
 
+// Sign In function
 exports.signin = async (req, res) => {
   const { email, password } = req.body;
 
