@@ -46,7 +46,6 @@ exports.signup = async (req, res) => {
 
 // Sign In function
 exports.signin = async (req, res) => {
-  console.log(process.env.PORT);
   const { email, password } = req.body;
 
   try {
@@ -91,6 +90,35 @@ exports.signin = async (req, res) => {
     });
 
     return res.status(200).json({ success: true, message: "Signed In" });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+exports.signout = async (req, res) => {
+  res
+    .clearCookie("token")
+    .status(200)
+    .json({ success: true, message: "logged out successfully" });
+};
+
+exports.sendVerificationCode = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "User Not Found" });
+    }
+
+    if (user.verified) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Already verified" });
+    }
+
+    const code = Math.floor(Math.random() * 100000).toString();
   } catch (err) {
     console.log(err);
   }
