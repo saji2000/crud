@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { hash } = require("../utils/hashing");
+const { hash, hmacProcess } = require("../utils/hashing");
+const { transport } = require("../middleware/sendMail");
 const { signupSchema, signinSchema } = require("../middleware/validator");
 const User = require("../models/usersModel");
 
@@ -119,6 +120,17 @@ exports.sendVerificationCode = async (req, res) => {
     }
 
     const code = Math.floor(Math.random() * 100000).toString();
+    let info = await transport.sendMail({
+      from: process.env.EMAIL_SENDER,
+      to: user.email,
+      subject: "Verify using the code",
+      html: "<h1>" + code + "</h1>",
+    });
+
+    if (info.accepted[0] === user.email) {
+      const hashedCode = hmacProcess(code, process.env.HMAC_VERIFICATION);
+      user.verificationCode = hashedCode;
+    }
   } catch (err) {
     console.log(err);
   }
