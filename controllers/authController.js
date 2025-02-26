@@ -103,35 +103,36 @@ exports.signout = async (req, res) => {
     .json({ success: true, message: "logged out successfully" });
 };
 
-exports.sendVerificationCode = async (req, res) => {
-  const { email } = req.body;
-  try {
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res
-        .status(401)
-        .json({ success: false, message: "User Not Found" });
-    }
+// Verification
+// exports.sendVerificationCode = async (req, res) => {
+//   const { email } = req.body;
+//   try {
+//     const user = await User.findOne({ email: email });
+//     if (!user) {
+//       return res
+//         .status(401)
+//         .json({ success: false, message: "User Not Found" });
+//     }
 
-    if (user.verified) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Already verified" });
-    }
+//     if (user.verified) {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: "Already verified" });
+//     }
 
-    const code = Math.floor(Math.random() * 100000).toString();
-    let info = await transport.sendMail({
-      from: process.env.EMAIL_SENDER,
-      to: user.email,
-      subject: "Verify using the code",
-      html: "<h1>" + code + "</h1>",
-    });
+//     const code = Math.floor(Math.random() * 100000).toString();
+//     let info = await transport.sendMail({
+//       from: process.env.EMAIL_SENDER,
+//       to: user.email,
+//       subject: "Verify using the code",
+//       html: "<h1>" + code + "</h1>",
+//     });
 
-    if (info.accepted[0] === user.email) {
-      const hashedCode = hmacProcess(code, process.env.HMAC_VERIFICATION);
-      user.verificationCode = hashedCode;
-    }
-  } catch (err) {
-    console.log(err);
-  }
-};
+//     if (info.accepted[0] === user.email) {
+//       const hashedCode = hmacProcess(code, process.env.HMAC_VERIFICATION);
+//       user.verificationCode = hashedCode;
+//     }
+//   } catch (err) {
+//     console.log(err);
+//   }
+// };
