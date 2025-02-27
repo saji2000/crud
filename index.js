@@ -5,6 +5,7 @@ const cookieParse = require("cookie-parser");
 const mongoose = require("mongoose");
 
 const authRouter = require("./routers/authRouter");
+const postRouter = require("./routers/postRouter");
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ mongoose
   .catch((err) => console.log(err));
 
 app.use("/api/auth", authRouter);
+app.use("/api/post", postRouter);
 
 app.get("/", (req, res) => {
   res.json({ message: "Hello from the server" });
